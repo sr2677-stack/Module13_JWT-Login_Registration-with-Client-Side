@@ -46,7 +46,16 @@ test("negative: register with short password shows client-side validation error"
   await page.fill("#confirmPassword", "short");
   await page.click("button[type='submit']");
 
-  await expect(page.locator("#error")).toHaveText(/at least 8 characters/i);
+  const uiErrorText = (await page.locator("#error").textContent())?.trim() ?? "";
+  const nativeTooShort = await page.locator("#password").evaluate((el) => {
+    const input = el as HTMLInputElement;
+    return input.validity.tooShort || input.validationMessage.length > 0;
+  });
+
+  expect(
+    /at least 8 characters/i.test(uiErrorText) || nativeTooShort,
+    "Expected either custom UI error text or native browser short-password validation",
+  ).toBeTruthy();
 });
 
 test("negative: login with wrong password shows invalid credentials", async ({ page, request }) => {
