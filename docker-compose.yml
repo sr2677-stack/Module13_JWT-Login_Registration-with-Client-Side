@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: jwt-auth-db
+    command: ["postgres", "-p", "5456"]
+    environment:
+      POSTGRES_DB: authdb
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: apppass
+    ports:
+      - "5456:5456"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U appuser -d authdb -p 5456"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: jwt-auth-api
+    environment:
+      DATABASE_URL: postgresql+psycopg2://appuser:apppass@db:5456/authdb
+      JWT_SECRET_KEY: super-secret-change-me
+      ACCESS_TOKEN_EXPIRE_MINUTES: 60
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
