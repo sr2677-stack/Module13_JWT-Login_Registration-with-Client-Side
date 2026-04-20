@@ -92,7 +92,7 @@ Pipeline behavior:
 
 Add your Docker Hub repo link here:
 
-- `https://hub.docker.com/r/<your-username>/jwt-auth-project`
+- `https://hub.docker.com/r/sr2677stack/jwt-auth-project`
 
 ## Submission Checklist
 
